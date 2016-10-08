@@ -170,7 +170,7 @@
 		
 	} // end class acf_user_type_field_settings
 	
-	if (!function_exists('blunt_plugins_list_meta_box')) {
+	if (!function_exists('jh_plugins_list_meta_box')) {
 		function jh_plugins_list_meta_box() {
 			$plugins = apply_filters('jh_plugins_list', array());
 				
