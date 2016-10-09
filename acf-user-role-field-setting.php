@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 1.1.1
+		Version: 1.2.0
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -172,6 +172,9 @@
 	
 	if (!function_exists('jh_plugins_list_meta_box')) {
 		function jh_plugins_list_meta_box() {
+			if (apply_filters('remove_hube2_nag', false)) {
+				return;
+			}
 			$plugins = apply_filters('jh_plugins_list', array());
 				
 			$id = 'plugins-by-john-huebner';
