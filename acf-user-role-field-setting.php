@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 1.3.0
+		Version: 2.0.0
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -30,19 +30,52 @@
 			add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
 			add_filter('acf/load_field', array($this, 'load_field'));
 			//add_action('acf/render_field_settings', array($this, 'render_field_settings'), 1);
-				add_filter('jh_plugins_list', array($this, 'meta_box_data'));
+			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
+			add_action('acf/save_post', array($this, 'save_post'), -1);
 		} // end public function __construct
-			
-			function meta_box_data($plugins=array()) {
-				
-				$plugins[] = array(
-					'title' => 'ACF User Role Field Setting',
-					'screens' => array('acf-field-group', 'edit-acf-field-group'),
-					'doc' => 'https://github.com/Hube2/acf-user-role-field-setting'
-				);
-				return $plugins;
-				
-			} // end function meta_box
+		
+		public function save_post($post_id) {
+			if (!isset($_POST['acf'])) {
+				return;
+			}
+			if (is_array($_POST['acf'])) {
+				$_POST['acf'] = $this->filter_post_values($_POST['acf']);
+			}
+		} // end public function save_post
+		
+		private function filter_post_values($input) {
+			// this is a recursive function the examinse all posted fields
+			// and removes any fields the a user is not supposed to have access to
+			$output = array();
+			foreach ($input as $index => $value) {
+				$keep = true;
+				if (substr($index, 0, 6) === 'field_') {
+					// check to see if this field can be edited
+					$field = get_field_object($index);
+					if (isset($field['user_roles'])) {
+						$keep = false;
+						if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+							foreach ($field['user_roles'] as $role) {
+								if ($role == 'all' || in_array($role, $this->current_user)) {
+									$keep = true;
+									// keepiing, no point in continuing to other rolese
+									break;
+								}
+							} // end foreach
+						} // end if settings is array
+					} // end if setting exists
+				} // end if field_
+				if ($keep) {
+					if (is_array($value)) {
+						// recurse nested array
+						$output[$index] = $this->filter_post_values($value);
+					} else {
+						$output[$index] = $value;
+					}
+				} // end if keep
+			} // end foreach input
+			return $output;
+		} // end private function filter_post_values
 		
 		public function load_field($field) {
 			//echo '<pre>'; print_r($field); echo '</pre>';
@@ -167,6 +200,15 @@
 			acf_render_field_setting($field, $args, false);
 			
 		} // end public function render_field_settings
+			
+		public function meta_box_data($plugins=array()) {
+			$plugins[] = array(
+				'title' => 'ACF User Role Field Setting',
+				'screens' => array('acf-field-group', 'edit-acf-field-group'),
+				'doc' => 'https://github.com/Hube2/acf-user-role-field-setting'
+			);
+			return $plugins;
+		} // end function meta_box_data
 		
 	} // end class acf_user_type_field_settings
 	

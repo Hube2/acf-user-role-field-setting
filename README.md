@@ -1,11 +1,14 @@
 # ACF User Role Field Setting
 
-***This plugin requires ACF Pro.***  
-This plugin will not provide any functionality if ACF Pro is not installed and active.
+***This plugin requires Advanced Custom Fields (ACF) Version >= 5.***  
+This plugin will not provide any functionality if ACF 5 is not installed and active. This plugin does
+not support ACF4 or before as the filters used were not available before ACF5.
 
 This plugin adds a field setting to all field types that allows for the selection of WP User Roles
 that should be allowed to manage the value of the field. Fields that the current user does not have
 permission to edit are removed from the field group when it's fields are loaded.
+
+## Additional Security for All ACF Fields
 
 ***Please note that this plugin does not hide the fields, it completely removes the fields!*** However,
 this removal does not effect any values that are already saved in the field.
@@ -17,6 +20,13 @@ Anyone with limited HTML knowledge can easily inspect and alter the HTML and CSS
 the fields visible and editable. If someone is not supposed to be able to modify a value then that value
 should not be present on the page in the first place. This is the only secure way to ensure that it
 cannot be edited.
+
+***$_POST['acf'] Input Checking*** All fields submitted are checked agains the user role field
+setting. Any submitted value that a user should not be able to edit is removed from the submitted
+values. This is done before acf saves any values. Why? This prevents the possibility of someone
+modifying a forms HTML to add input fields that they are not supposed to be able to edit. A field
+that a user should not be able to edit could only be submitted by aomeone attempting to hack the
+form.
 
 ***Caution:*** It is possible to set a field so that it can never be edited by anyone. This can be done
 in several ways. The first example is easy, simply do not select any user role that can edit the field.
