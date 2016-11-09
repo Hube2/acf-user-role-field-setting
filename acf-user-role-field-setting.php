@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 2.0.0
+		Version: 2.0.1
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -142,7 +142,7 @@
 			// recursive function
 			// see if field should be kept
 			$keep_fields = array();
-			if (count($fields)) {
+			if (is_array($field) && count($fields)) {
 				foreach ($fields as $field) {
 					$keep = false;
 					if (isset($field['user_roles'])) {
@@ -179,7 +179,9 @@
 						$keep_fields[] = $field;
 					}
 				} // end foreach field
-			} // end if fields
+			} else {
+				return $fields;
+			}
 			return $keep_fields;
 		} // end private function check_fields
 		
