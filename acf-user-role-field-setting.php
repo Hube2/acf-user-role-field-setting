@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 2.0.1
+		Version: 2.1.0
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -27,12 +27,55 @@
 		
 		public function __construct() {
 			add_action('acf/init', array($this, 'init'));
-			add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
 			add_filter('acf/load_field', array($this, 'load_field'));
 			//add_action('acf/render_field_settings', array($this, 'render_field_settings'), 1);
 			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
 			add_action('acf/save_post', array($this, 'save_post'), -1);
+			add_action('plugins_loaded', array($this, 'plugins_loaded'));
 		} // end public function __construct
+		
+		public function plugins_loaded() {
+			// check the ACF version
+			// if >= 5.5.0 use the acf/prepare_field hook to remove fields
+			if (!function_exists('acf_get_setting')) {
+				// acf is not installed/active
+				return;
+			}
+			$acf_version = acf_get_setting('version');
+			if (version_compare($acf_version, '5.5.0', '>=')) {
+				add_filter('acf/prepare_field', array($this, 'prepare_field'), 99);
+				return;
+			}
+			// if < 5.5.0 user the acf/get_fields hook to remove fields
+			add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
+		} // end public function plugins_loaded
+		
+		public function prepare_field($field) {
+			$keep = false;
+			if (isset($field['user_roles'])) {
+				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+					foreach ($field['user_roles'] as $role) {
+						if ($role != 'all' && !in_array($role, $this->current_user)) {
+							$keep = true;
+							// already keeping, no point in continuing to check
+							break;
+						}
+					}
+				} else {
+					// no user roles have been selected for this field
+					// it will never be displayed, this is probably an error
+				}
+			} else {
+				// user roles not set for this field
+				// this field was created before this plugin was in use
+				// or user roles is otherwise disabled for this field
+				$keep = true;
+			}
+			if (!$keep) {
+				return false;
+			}
+			return $field;
+		} // end public function prepare_field
 		
 		public function save_post($post_id) {
 			if (!isset($_POST['acf'])) {
@@ -142,7 +185,7 @@
 			// recursive function
 			// see if field should be kept
 			$keep_fields = array();
-			if (is_array($field) && count($fields)) {
+			if (is_array($fields) && count($fields)) {
 				foreach ($fields as $field) {
 					$keep = false;
 					if (isset($field['user_roles'])) {
