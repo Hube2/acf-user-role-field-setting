@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 2.1.0
+		Version: 2.1.1
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -51,14 +51,15 @@
 		} // end public function plugins_loaded
 		
 		public function prepare_field($field) {
-			$keep = false;
+			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
+			if (in_array($field['type'], $exclude)) {
+				return $field;
+			}
 			if (isset($field['user_roles'])) {
 				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
 					foreach ($field['user_roles'] as $role) {
-						if ($role != 'all' && !in_array($role, $this->current_user)) {
-							$keep = true;
-							// already keeping, no point in continuing to check
-							break;
+						if ($role == 'all' || in_array($role, $this->current_user)) {
+							return $field;
 						}
 					}
 				} else {
@@ -69,18 +70,16 @@
 				// user roles not set for this field
 				// this field was created before this plugin was in use
 				// or user roles is otherwise disabled for this field
-				$keep = true;
+				return $field;
 			}
-			if (!$keep) {
-				return false;
-			}
-			return $field;
+			return false;
 		} // end public function prepare_field
 		
 		public function save_post($post_id) {
 			if (!isset($_POST['acf'])) {
 				return;
 			}
+			$this->exclude_field_types = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
 			if (is_array($_POST['acf'])) {
 				$_POST['acf'] = $this->filter_post_values($_POST['acf']);
 			}
@@ -95,18 +94,22 @@
 				if (substr($index, 0, 6) === 'field_') {
 					// check to see if this field can be edited
 					$field = get_field_object($index);
-					if (isset($field['user_roles'])) {
-						$keep = false;
-						if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
-							foreach ($field['user_roles'] as $role) {
-								if ($role == 'all' || in_array($role, $this->current_user)) {
-									$keep = true;
-									// keepiing, no point in continuing to other rolese
-									break;
-								}
-							} // end foreach
-						} // end if settings is array
-					} // end if setting exists
+					if (in_array($field['type'], $this->exclude_field_types)) {
+						$keep = true;
+					} else {
+						if (isset($field['user_roles'])) {
+							$keep = false;
+							if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+								foreach ($field['user_roles'] as $role) {
+									if ($role == 'all' || in_array($role, $this->current_user)) {
+										$keep = true;
+										// keepiing, no point in continuing to other rolese
+										break;
+									}
+								} // end foreach
+							} // end if settings is array
+						} // end if setting exists
+					} // end if excluded field type else
 				} // end if field_
 				if ($keep) {
 					if (is_array($value)) {
@@ -177,6 +180,7 @@
 				// do not alter when editing field or field group
 				return $fields;
 			}
+			$this->exclude_field_types = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
 			$fields = $this->check_fields($fields);
 			return $fields;
 		} // end public function get_fields
@@ -188,25 +192,29 @@
 			if (is_array($fields) && count($fields)) {
 				foreach ($fields as $field) {
 					$keep = false;
-					if (isset($field['user_roles'])) {
-						if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
-							foreach ($field['user_roles'] as $role) {
-								if ($role == 'all' || in_array($role, $this->current_user)) {
-									$keep = true;
-									// already keeping, no point in continuing to check
-									break;
+					if (in_array($field['type'], $this->exclude_field_types)) {
+						$keep = true;
+					} else {
+						if (isset($field['user_roles'])) {
+							if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+								foreach ($field['user_roles'] as $role) {
+									if ($role == 'all' || in_array($role, $this->current_user)) {
+										$keep = true;
+										// already keeping, no point in continuing to check
+										break;
+									}
 								}
 							}
+						} else {
+							// field setting is not set
+							// this field was created before this plugin was in use
+							// or this field is not effected, it could be a "layout"
+							// there is currently no way to add field settings to
+							// layouts in ACF
+							// assume 'all'
+							$keep = true;
 						}
-					} else {
-						// field setting is not set
-						// this field was created before this plugin was in use
-						// or this field is not effected, it could be a "layout"
-						// there is currently no way to add field settings to
-						// layouts in ACF
-						// assume 'all'
-						$keep = true;
-					}
+					} // end if excluded type else
 					if ($keep) {
 						$sub_fields = false;
 						if (isset($field['layouts'])) {
