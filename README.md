@@ -11,7 +11,8 @@ permission to edit are removed from the field group when it's fields are loaded.
 ## Additional Security for All ACF Fields
 
 ***Please note that this plugin does not hide the fields, it completely removes the fields!*** However,
-this removal does not effect any values that are already saved in the field.
+this removal does not effect any values that are already saved in the field. This plugin does not effect the operation of any of the other ACF function like get_field(), the_field(), get_fields(), get_field_ojects(), etc. If you find any of the template functions are being effected by this plugin please 
+[open a new issue](https://github.com/Hube2/acf-user-role-field-setting/issues).
 
 ***Why remove fields?*** Using an ACF load_field filter it is possible disable a field or to make a field
 read only. It is also possible to add CSS in the admin head to hide a field base on the user. However,
