@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
 		Description: Set user types that should see fields
-		Version: 2.1.1
+		Version: 2.1.2
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -138,8 +138,18 @@
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
 			$sections = acf_get_field_types();
 			//echo '<pre>'; print_r($sections); die;
-			foreach ($sections as $section) {
-				foreach ($section as $type => $label) {
+			$acf_version = acf_get_setting('version');
+			if (version_compare($acf_version, '5.5.0', '<')) {
+				foreach ($sections as $section) {
+					foreach ($section as $type => $label) {
+						if (!isset($exclude[$type])) {
+							add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
+						}
+					}
+				}
+			} else {
+				// >= 5.5.0
+				foreach ($sections as $type => $settings) {
 					if (!isset($exclude[$type])) {
 						add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
 					}
