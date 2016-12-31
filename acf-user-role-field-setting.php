@@ -1,10 +1,10 @@
 <?php 
 	
 	/* 
-		Plugin Name: ACF User Role Field Setting
+		Plugin Name: User Role Field Setting for ACF
 		Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
-		Description: Set user types that should see fields
-		Version: 2.1.2
+		Description: Set user types that should be allowed to edit fields
+		Version: 2.1.3
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		GitHub Plugin URI: https://github.com/Hube2/acf-user-role-field-setting
@@ -28,7 +28,6 @@
 		public function __construct() {
 			add_action('acf/init', array($this, 'init'));
 			add_filter('acf/load_field', array($this, 'load_field'));
-			//add_action('acf/render_field_settings', array($this, 'render_field_settings'), 1);
 			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
 			add_action('acf/save_post', array($this, 'save_post'), -1);
 			add_action('plugins_loaded', array($this, 'plugins_loaded'));
