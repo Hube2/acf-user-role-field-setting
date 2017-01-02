@@ -47,7 +47,12 @@ Nothing yet
 
 == Other Notes ==
 
-=== Excluded Field Types ===
+== Github Repository ==
+
+This plugin is also on GitHub 
+[https://github.com/Hube2/acf-user-role-field-setting](https://github.com/Hube2/acf-user-role-field-setting)
+
+== Excluded Field Types ==
 
 Most of the time it would not make sense for a tab field, unless all of the fields in the tab were set the same, in other words, removing a tab should remove all the fields in that tab. That's not something that I can do at this point.
 
@@ -79,7 +84,8 @@ I also added a filter so that you can adjust the types of fields that are exclud
 ?>
 `
 
-=== Remove Nag ===
+== Remove Nag ==
+
 If you would like to remove my little nag that appears on some admin pages add the following to your functions.php file
 `
 add_filter('remove_hube2_nag', '__return_true');
