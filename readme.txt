@@ -1,9 +1,9 @@
-=== User Role Field Setting for ACF ===
+=== ACF User Role Field Setting ===
 Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 4.7 
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ add_filter('remove_hube2_nag', '__return_true');
 `
 
 == Changelog ==
+
+= 2.1.4 =
+* removed github updater support
 
 = 2.1.3 =
 * initial release as a WordPress Plugin
