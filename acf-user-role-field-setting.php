@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 2.1.4
+		Version: 2.1.5
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -25,11 +25,12 @@
 		);
 		
 		public function __construct() {
-			add_action('acf/init', array($this, 'init'));
+			add_action('init', array($this, 'init'));
 			add_filter('acf/load_field', array($this, 'load_field'));
 			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
 			add_action('acf/save_post', array($this, 'save_post'), -1);
 			add_action('plugins_loaded', array($this, 'plugins_loaded'));
+			add_filter('acf/get_field_types', array($this, 'add_actions'), 20, 1);
 		} // end public function __construct
 		
 		public function plugins_loaded() {
@@ -129,15 +130,13 @@
 		public function init() {
 			$this->get_roles();
 			$this->current_user_roles();
-			$this->add_actions();
 		} // end public function init
 		
-		private function add_actions() {
+		public function add_actions($types) {
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
-			$sections = acf_get_field_types();
-			//echo '<pre>'; print_r($sections); die;
 			$acf_version = acf_get_setting('version');
 			if (version_compare($acf_version, '5.5.0', '<')) {
+				$sections = $types;
 				foreach ($sections as $section) {
 					foreach ($section as $type => $label) {
 						if (!isset($exclude[$type])) {
@@ -147,13 +146,14 @@
 				}
 			} else {
 				// >= 5.5.0
-				foreach ($sections as $type => $settings) {
+				foreach ($types as $type => $settings) {
 					if (!isset($exclude[$type])) {
 						add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
 					}
 				}
 			}
-		} // end private function add_actions
+			return $types;
+		} // end public function add_actions
 		
 		private function current_user_roles() {
 			global $current_user;
