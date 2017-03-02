@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 4.7 
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ add_filter('remove_hube2_nag', '__return_true');
 `
 
 == Changelog ==
+
+= 2.1.6 =
+* corrects issue with setting not appearing during js field initialization cause by 2.1.5 update
 
 = 2.1.5 =
 * altered field setting initialization to deal with non-standard ACF add on field types that do not initialize their fields when they are supposed on the correct ACF hooks
