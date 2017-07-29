@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 2.1.8
+		Version: 2.1.9
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -28,12 +28,11 @@
 			add_action('init', array($this, 'init'), 20);
 			add_filter('acf/load_field', array($this, 'load_field'));
 			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
-			add_action('acf/save_post', array($this, 'save_post'), -1);
-			add_action('plugins_loaded', array($this, 'plugins_loaded'));
+			add_action('after_setup_theme', array($this, 'after_setup_theme'));
 			//add_filter('acf/get_field_types', array($this, 'add_actions'), 20, 1);
 		} // end public function __construct
 		
-		public function plugins_loaded() {
+		public function setup_theme() {
 			// check the ACF version
 			// if >= 5.5.0 use the acf/prepare_field hook to remove fields
 			if (!function_exists('acf_get_setting')) {
@@ -43,11 +42,16 @@
 			$acf_version = acf_get_setting('version');
 			if (version_compare($acf_version, '5.5.0', '>=')) {
 				add_filter('acf/prepare_field', array($this, 'prepare_field'), 99);
-				return;
+			} else {
+				// if < 5.5.0 user the acf/get_fields hook to remove fields
+				add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
 			}
-			// if < 5.5.0 user the acf/get_fields hook to remove fields
-			add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
-		} // end public function plugins_loaded
+			if (version_compare($acf_version, '5.6.0', '<')) {
+				add_action('acf/save_post', array($this, 'save_post'), -1);
+			} else {
+				add_action('acf/init', array($this, 'save_post'));
+			}
+		} // end public function setup_theme
 		
 		public function prepare_field($field) {
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
@@ -74,7 +78,7 @@
 			return false;
 		} // end public function prepare_field
 		
-		public function save_post($post_id) {
+		public function save_post($post_id=false, $values=array()) {
 			if (!isset($_POST['acf'])) {
 				return;
 			}
@@ -140,7 +144,6 @@
 			}
 			$acf_version = acf_get_setting('version');
 			$sections = acf_get_field_types();
-			//echo '<pre>'; print_r($sections); die;
 			if (version_compare($acf_version, '5.5.0', '<') || version_compare($acf_version, '5.6.0', '>=')) {
 				foreach ($sections as $section) {
 					foreach ($section as $type => $label) {
