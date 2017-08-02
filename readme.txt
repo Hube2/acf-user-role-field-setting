@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 2.1.10
+Stable tag: 2.1.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ add_filter('remove_hube2_nag', '__return_true');
 `
 
 == Changelog ==
+
+= 2.1.11 =
+* corrected issue - field values not saved when fields set for specifice user roles
 
 = 2.1.10 =
 * corrected warning call_user_func_array() expects parameter 1 to be a valid callback
