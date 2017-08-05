@@ -93,6 +93,9 @@ add_filter('remove_hube2_nag', '__return_true');
 
 == Changelog ==
 
+= 2.1.12 =
+* minor code reorganiztion in prepare_field filter
+
 = 2.1.11 =
 * corrected issue - field values not saved when fields set for specifice user roles
 

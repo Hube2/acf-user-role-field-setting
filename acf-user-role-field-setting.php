@@ -55,15 +55,16 @@
 		} // end public function after_setup_theme
 		
 		public function prepare_field($field) {
+			$return_field = false;
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
 			if (in_array($field['type'], $exclude)) {
-				return $field;
+				$return_field = true;
 			}
 			if (isset($field['user_roles'])) {
 				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
 					foreach ($field['user_roles'] as $role) {
 						if ($role == 'all' || in_array($role, $this->current_user)) {
-							return $field;
+							$return_field = true;
 						}
 					}
 				} else {
@@ -74,6 +75,9 @@
 				// user roles not set for this field
 				// this field was created before this plugin was in use
 				// or user roles is otherwise disabled for this field
+				$return_field = true;
+			}
+			if ($return_field) {
 				return $field;
 			}
 			return false;
