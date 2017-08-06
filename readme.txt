@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 2.1.11
+Stable tag: 2.1.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -95,6 +95,10 @@ add_filter('remove_hube2_nag', '__return_true');
 
 = 2.1.12 =
 * minor code reorganiztion in prepare_field filter
+* other code cleanup
+* reverted to acf/save_post for $_POST filtering (corrected in ACF)
+* corrected an issue with repeater sub fields when reordered
+* PLEASE NOTE THAT VERSION 3 WILL REMOVE SUPPORT FOR ACF < 5.5.0
 
 = 2.1.11 =
 * corrected issue - field values not saved when fields set for specifice user roles

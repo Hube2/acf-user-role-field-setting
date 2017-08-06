@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 2.1.11
+		Version: 2.1.12
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -23,13 +23,14 @@
 			'tab' => 'tab',
 			'clone' => 'clone'
 		);
+		private $removed = array();
 		
 		public function __construct() {
 			add_action('init', array($this, 'init'), 1);
 			add_action('acf/init', array($this, 'add_actions'));
-			add_filter('acf/load_field', array($this, 'load_field'));
-			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
+			add_action('acf/save_post', array($this, 'save_post'), -1);
 			add_action('after_setup_theme', array($this, 'after_setup_theme'));
+			add_filter('jh_plugins_list', array($this, 'meta_box_data'));
 			//add_filter('acf/get_field_types', array($this, 'add_actions'), 20, 1);
 		} // end public function __construct
 		
@@ -46,11 +47,6 @@
 			} else {
 				// if < 5.5.0 user the acf/get_fields hook to remove fields
 				add_filter('acf/get_fields', array($this, 'get_fields'), 20, 2);
-			}
-			if (version_compare($acf_version, '5.6.0', '<')) {
-				add_action('acf/save_post', array($this, 'save_post'), -1);
-			} else {
-				add_action('acf/init', array($this, 'save_post'));
 			}
 		} // end public function after_setup_theme
 		
@@ -77,8 +73,16 @@
 				// or user roles is otherwise disabled for this field
 				$return_field = true;
 			}
+			//echo '<pre>'; print_r($field); echo '</pre>';
 			if ($return_field) {
 				return $field;
+			}
+			preg_match('/(\[[^\]]+\])/', $field['name'], $matches);
+			$name = $matches[1];
+			if (!in_array($name, $this->removed)) {
+				$this->removed[] = $name;
+				?><input type="hidden" name="acf_removed<?php echo $name; ?>" value="<?php 
+						echo $field['name']; ?>" /><?php 
 			}
 			return false;
 		} // end public function prepare_field
@@ -91,7 +95,32 @@
 			if (is_array($_POST['acf'])) {
 				$_POST['acf'] = $this->filter_post_values($_POST['acf']);
 			}
+			if (isset($_POST['acf_removed'])) {
+				$this->get_removed($post_id);
+				$_POST['acf'] = $this->array_merge_recursive_distinct($_POST['acf'], $_POST['acf_removed']);
+			}
 		} // end public function save_post
+		
+		private function get_removed($post_id) {
+			foreach ($_POST['acf_removed'] as $field_key => $value) {
+				$_POST['acf_removed'][$field_key] = get_field($field_key, $post_id, false);
+			}
+		} // end private function get_removed
+		
+		private function array_merge_recursive_distinct(array &$array1, array &$array2) {
+			$merged = $array1;
+			foreach ($array2 as $key => &$value) {
+				if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+					$merged[$key] = $this->array_merge_recursive_distinct($merged[$key], $value);
+				} else {
+					// do not overwrite value in first array
+					if (!isset($merged[$key])) {
+						$merged[$key] = $value;
+					}
+				}
+			}
+			return $merged;
+		} // end private function array_merge_recursive_distinct
 		
 		private function filter_post_values($input) {
 			// this is a recursive function the examinse all posted fields
@@ -131,15 +160,9 @@
 			return $output;
 		} // end private function filter_post_values
 		
-		public function load_field($field) {
-			//echo '<pre>'; print_r($field); echo '</pre>';
-			return $field;
-		} // end public function load_field
-		
 		public function init() {
 			$this->get_roles();
 			$this->current_user_roles();
-			//$this->add_actions();
 		} // end public function init
 		
 		public function add_actions() {
