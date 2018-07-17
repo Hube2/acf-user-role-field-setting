@@ -172,7 +172,7 @@
 			}
 			$acf_version = acf_get_setting('version');
 			$sections = acf_get_field_types();
-			if (version_compare($acf_version, '5.5.0', '<') || version_compare($acf_version, '5.6.0', '>=')) {
+			if ((version_compare($acf_version, '5.5.0', '<') || version_compare($acf_version, '5.6.0', '>=')) && version_compare($acf_version, '5.7.0', '<')) {
 				foreach ($sections as $section) {
 					foreach ($section as $type => $label) {
 						if (!isset($exclude[$type])) {
