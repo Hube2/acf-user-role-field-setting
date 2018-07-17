@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 4.9
-Stable tag: 2.1.12
+Stable tag: 2.1.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ add_filter('remove_hube2_nag', '__return_true');
 `
 
 == Changelog ==
+
+= 2.1.13 =
+* Correct issue w/ACF 5.7.0
 
 = 2.1.12 =
 * minor code reorganiztion in prepare_field filter
