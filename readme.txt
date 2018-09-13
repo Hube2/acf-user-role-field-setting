@@ -93,7 +93,7 @@ add_filter('remove_hube2_nag', '__return_true');
 
 == Changelog ==
 
-= 2.2.13 =
+= 2.1.13 =
 * corrected issue w/deleting repeater rows when sub fields is removed
 * Correct issue w/ACF 5.7.0
 
