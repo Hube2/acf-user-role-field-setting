@@ -77,7 +77,7 @@
 			if ($return_field) {
 				return $field;
 			}
-			preg_match('/(\[[^\]]+\])/', $field['name'], $matches);
+			preg_match('/(\[[^\]]+\])$/', $field['name'], $matches);
 			$name = $matches[1];
 			if (!in_array($name, $this->removed)) {
 				$this->removed[] = $name;
