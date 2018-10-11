@@ -4,7 +4,7 @@
   "type": "wordpress-plugin",
   "authors": [
     {
-      "name": "John A. Huebner II",
+      "name": "John A. Huebner II"
     }
   ],
   "minimum-stability": "dev"
