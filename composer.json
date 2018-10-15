@@ -1,0 +1,11 @@
+{
+  "name": "Hube2/acf-user-role-field-setting",
+  "description": "acf-user-role-field-setting",
+  "type": "wordpress-plugin",
+  "authors": [
+    {
+      "name": "John A. Huebner II"
+    }
+  ],
+  "minimum-stability": "dev"
+}
