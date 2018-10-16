@@ -93,6 +93,9 @@ add_filter('remove_hube2_nag', '__return_true');
 
 == Changelog ==
 
+= 2.1.15 =
+* added composer support
+
 = 2.1.14 =
 * resolving version # issue with WP SVN
 
