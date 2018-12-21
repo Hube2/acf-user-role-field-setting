@@ -2,8 +2,8 @@
 Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
-Tested up to: 4.9
-Stable tag: 2.1.14
+Tested up to: 5.0
+Stable tag: 2.1.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -95,6 +95,7 @@ add_filter('remove_hube2_nag', '__return_true');
 
 = 2.1.15 =
 * added composer support
+* removed donation nag
 
 = 2.1.14 =
 * resolving version # issue with WP SVN
