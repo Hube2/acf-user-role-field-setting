@@ -2,8 +2,8 @@
 Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
-Tested up to: 5.1
-Stable tag: 2.1.15
+Tested up to: 5.2
+Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,18 +18,6 @@ This is an add on plugin for Advanced Custom Fields (ACF) Version 5.
 
 This plugin adds a field setting to all field types so that user roles allowed to edit the field can
 be selected. Only those roles selected for the field will be able to edit the field.
-
-This adds additional security to fields. This plugin does not simply hide field, it removes them
-completely from the field group. Using standard ACF filters is is possible to set many field types to
-readonly or disabled. It is even possible by adding custom CSS to hide fields based on the current
-user's role. However, this is not a secure way to prevent those that should not be allowed to edit
-a field from editing them if they really want to. Anyone with limited HTML knowledge can easily instpect
-the HTML of a page and alter the html and css to make the fields visible and editable. The only secure
-way to prevent the fields from being edited is to not have them present in the form to begin with.
-
-***$_POST Filtering:*** In addition to removing the fields from field groups so that they can not be
-edited this plugin also checks submitted values to see if the current user is allowed to manage the
-fields submitted before allowing ACF to save any values to the database.
 
 
 == Installation ==
@@ -58,7 +46,9 @@ Most of the time it would not make sense for a tab field, unless all of the fiel
 
 I'm not sure about the clone field, I haven't worked with it much. You can test it out if you want.
 
-I also added a filter so that you can adjust the types of fields that are excluded. Here is an example
+I have also removed support for repeater, group and flexible content fields because I cannot preserver the values of these fields if they are not editable in the ACF interface. Please note that I do not know what the effect of allowing user role settings on these fields will be.
+
+There is a filter so that you can adjust the types of fields that are excluded. Here is an example
 `
 <?php 
   
@@ -84,14 +74,13 @@ I also added a filter so that you can adjust the types of fields that are exclud
 ?>
 `
 
-== Remove Nag ==
-
-If you would like to remove my little nag that appears on some admin pages add the following to your functions.php file
-`
-add_filter('remove_hube2_nag', '__return_true');
-`
-
 == Changelog ==
+
+= 3.0.0 =
+* removed support for ACF < Version 5.5.0
+* removed user role setting from repeater, group and flexibe content fields (these can be re-enabled using available filter, however doing so may not be safe)
+* corrected issue with repeater sub field reordering
+* no longer filtering $_POST to corect repeater reordering issue
 
 = 2.1.15 =
 * added composer support
