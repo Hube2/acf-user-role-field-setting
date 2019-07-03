@@ -20,11 +20,7 @@
 		private $choices = array();
 		private $current_user = array();
 		private $exclude_field_types = array(
-			'tab' => 'tab',
-			'clone' => 'clone',
-			'repeater' => 'repeater',
-			'group' => 'group',
-			'flexible_content' => 'flexible_content'
+			'tab' => 'tab'
 		);
 		
 		public function __construct() {
@@ -48,10 +44,13 @@
 		
 		public function prepare_field($field) {
 			global $post;
-			$post_type = get_post_type($post->ID);
-			if ($post_type == 'acf-field' || $post_type == 'acf-field-group') {
-				return $field;
+			if ($post) {
+				$post_type = get_post_type($post->ID);
+				if ($post_type == 'acf-field' || $post_type == 'acf-field-group') {
+					return $field;
+				}
 			}
+			//echo '<pre>'; print_r($field); echo '</pre>';
 			$return_field = false;
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
 			if (in_array($field['type'], $exclude)) {
@@ -77,13 +76,19 @@
 			if ($return_field) {
 				return $field;
 			}
-			if (!in_array($field['type'], array('tab', 'clone', 'repeater', 'group', 'flexible_content'))) {
-				// output a hidden field, this preserves repeater sub fields
-				?><input type="hidden" name="<?php echo $field['name']; ?>" value="<?php 
-						echo $field['value']; ?>" /><?php 
-			}
+			$this->output_hidden_fields($field['name'], $field['value']);
 			return false;
 		} // end public function prepare_field
+		
+		private function output_hidden_fields($field_name, $value) {
+			if (is_array($value)) {
+				foreach ($value as $i => $v) {
+					$this->output_hidden_fields($field_name.'['.$i.']', $v);
+				}
+			} else {
+				?><input type="hidden" name="<?php echo $field_name; ?>" value="<?php echo $value; ?>" /><?php 
+			}
+		} // end private function output_hidden_fields
 		
 		public function init() {
 			$this->get_roles();
