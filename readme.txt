@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 5.2
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,11 @@ There is a filter so that you can adjust the types of fields that are excluded. 
 `
 
 == Changelog ==
+
+= 3.0.1 =
+* Corrected issue with getting property of non object
+* Corrected issues with fields that have array values
+* Re-enabled repeaters
 
 = 3.0.0 =
 * removed support for ACF < Version 5.5.0
