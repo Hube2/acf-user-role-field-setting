@@ -48,42 +48,43 @@
 		
 		public function prepare_field($field) {
 			global $post;
-			if($post){
+			if($post != null){
 				$post_type = get_post_type($post->ID);
 				if ($post_type == 'acf-field' || $post_type == 'acf-field-group') {
 					return $field;
 				}
-				$return_field = false;
-				$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
-				if (in_array($field['type'], $exclude)) {
-					$return_field = true;
-				}
-				if (isset($field['user_roles'])) {
-					if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
-						foreach ($field['user_roles'] as $role) {
-							if ($role == 'all' || in_array($role, $this->current_user)) {
-								$return_field = true;
-							}
+			}
+			$return_field = false;
+			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
+			if (in_array($field['type'], $exclude)) {
+				$return_field = true;
+			}
+			if (isset($field['user_roles'])) {
+				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+					foreach ($field['user_roles'] as $role) {
+						if ($role == 'all' || in_array($role, $this->current_user)) {
+							$return_field = true;
 						}
-					} else {
-						// no user roles have been selected for this field
-						// it will never be displayed, this is probably an error
 					}
 				} else {
-					// user roles not set for this field
-					// this field was created before this plugin was in use
-					// or user roles is otherwise disabled for this field
-					$return_field = true;
+					// no user roles have been selected for this field
+					// it will never be displayed, this is probably an error
 				}
-				if ($return_field) {
-					return $field;
-				}
-				if (!in_array($field['type'], array('tab', 'clone', 'repeater', 'group', 'flexible_content'))) {
-					// output a hidden field, this preserves repeater sub fields
-					?><input type="hidden" name="<?php echo $field['name']; ?>" value="<?php 
-							echo $field['value']; ?>" /><?php 
-				}
+			} else {
+				// user roles not set for this field
+				// this field was created before this plugin was in use
+				// or user roles is otherwise disabled for this field
+				$return_field = true;
 			}
+			if ($return_field) {
+				return $field;
+			}
+			if (!in_array($field['type'], array('tab', 'clone', 'repeater', 'group', 'flexible_content'))) {
+				// output a hidden field, this preserves repeater sub fields
+				?><input type="hidden" name="<?php echo $field['name']; ?>" value="<?php 
+						echo $field['value']; ?>" /><?php 
+			}
+			
 			return false;
 		} // end public function prepare_field
 		
