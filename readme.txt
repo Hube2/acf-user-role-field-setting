@@ -3,7 +3,7 @@ Contributors: Hube2
 Tags: acf, advanced custom fields, user role, setting, security, multisite
 Requires at least: 4.0
 Tested up to: 5.2
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,9 @@ There is a filter so that you can adjust the types of fields that are excluded. 
 `
 
 == Changelog ==
+
+= 3.0.2 =
+* Changed super admin test permission from "update_core" to "manage_network"
 
 = 3.0.1 =
 * Corrected issue with getting property of non object

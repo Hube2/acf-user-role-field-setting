@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 3.0.0
+		Version: 3.0.2
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -42,6 +42,32 @@
 			}
 		} // end public function after_setup_theme
 		
+		private function user_can_edit($field) {
+			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
+			if (in_array($field['type'], $exclude)) {
+				return true;
+			}
+			if (isset($field['user_roles'])) {
+				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
+					foreach ($field['user_roles'] as $role) {
+						if ($role == 'all' || in_array($role, $this->current_user)) {
+							return true;
+						}
+					}
+				} else {
+					// no user roles have been selected for this field
+					// it will never be displayed, this is probably an error
+					return false;
+				}
+			} else {
+				// user roles not set for this field
+				// this field was created before this plugin was in use
+				// or user roles is otherwise disabled for this field
+				return true;
+			}
+			return false;
+		} // end private function user_can_edit
+		
 		public function prepare_field($field) {
 			global $post;
 			if ($post) {
@@ -51,29 +77,7 @@
 				}
 			}
 			//echo '<pre>'; print_r($field); echo '</pre>';
-			$return_field = false;
-			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
-			if (in_array($field['type'], $exclude)) {
-				$return_field = true;
-			}
-			if (isset($field['user_roles'])) {
-				if (!empty($field['user_roles']) && is_array($field['user_roles'])) {
-					foreach ($field['user_roles'] as $role) {
-						if ($role == 'all' || in_array($role, $this->current_user)) {
-							$return_field = true;
-						}
-					}
-				} else {
-					// no user roles have been selected for this field
-					// it will never be displayed, this is probably an error
-				}
-			} else {
-				// user roles not set for this field
-				// this field was created before this plugin was in use
-				// or user roles is otherwise disabled for this field
-				$return_field = true;
-			}
-			if ($return_field) {
+			if ($this->user_can_edit($field)) {
 				return $field;
 			}
 			$this->output_hidden_fields($field['name'], $field['value']);
@@ -128,7 +132,7 @@
 			if (is_object($current_user) && isset($current_user->roles)) {
 				$this->current_user = $current_user->roles;
 			}
-			if (is_multisite() && current_user_can('update_core')) {
+			if (is_multisite() && current_user_can('manage_network')) {
 				$this->current_user[] = 'super_admin';
 			}
 		} // end private function current_user_roles
