@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 3.0.2
+		Version: 4.0.0
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -70,7 +70,7 @@
 		
 		public function prepare_field($field) {
 			global $post;
-			if ($post) {
+			if (is_a($post, 'WP_Post')) {
 				$post_type = get_post_type($post->ID);
 				if ($post_type == 'acf-field' || $post_type == 'acf-field-group') {
 					return $field;
@@ -80,11 +80,12 @@
 			if ($this->user_can_edit($field)) {
 				return $field;
 			}
-			$this->output_hidden_fields($field['name'], $field['value']);
+			//$this->output_hidden_fields($field['name'], $field['value']);
 			return false;
 		} // end public function prepare_field
 		
 		private function output_hidden_fields($field_name, $value) {
+			// outputting of hidden fields removed as of 4.0.0
 			if (is_array($value)) {
 				foreach ($value as $i => $v) {
 					$this->output_hidden_fields($field_name.'['.$i.']', $v);
@@ -153,6 +154,19 @@
 		} // end private function get_roles
 		
 		public function render_field_settings($field) {
+			$sub_field = false;
+			$parent = $field['parent'];
+			if (is_numeric($parent)) {
+				$post = get_post($parent);
+				if (!is_a($post, 'WP_Post') || $post->post_type != 'acf-field-group') {
+					$sub_field = true;
+				}
+			} elseif (substr($field['parent'], 0, 6) != 'group_') {
+				$sub_field = true;
+			}
+			if ($sub_field) {
+				return;
+			}
 			$args = array(
 				'type' => 'checkbox',
 				'label' => 'User Roles',
