@@ -44,7 +44,7 @@
 		
 		private function user_can_edit($field) {
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
-			if (in_array($field['type'], $exclude)) {
+			if (isset($field['type']) && is_array($exclude) && in_array($field['type'], $exclude)) {
 				return true;
 			}
 			if (isset($field['user_roles'])) {
