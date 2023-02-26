@@ -4,7 +4,7 @@
 		Plugin Name: ACF User Role Field Setting
 		Plugin URI: https://wordpress.org/plugins/user-role-field-setting-for-acf/
 		Description: Set user types that should be allowed to edit fields
-		Version: 4.0.0
+		Version: 4.0.1
 		Author: John A. Huebner II
 		Author URI: https://github.com/Hube2/
 		License: GPL
@@ -44,7 +44,7 @@
 		
 		private function user_can_edit($field) {
 			$exclude = apply_filters('acf/user_role_setting/exclude_field_types', $this->exclude_field_types);
-			if (in_array($field['type'], $exclude)) {
+			if (is_array($exclude) && in_array($field['type'], $exclude)) {
 				return true;
 			}
 			if (isset($field['user_roles'])) {
@@ -113,7 +113,7 @@
 			if (version_compare($acf_version, '5.6.0', '>=') && version_compare($acf_version, '5.7.0', '<')) {
 				foreach ($sections as $section) {
 					foreach ($section as $type => $label) {
-						if (!isset($exclude[$type])) {
+						if (empty($exclude[$type])) {
 							add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
 						}
 					}
@@ -121,7 +121,7 @@
 			} else {
 				// >= 5.5.0 || < 5.6.0
 				foreach ($sections as $type => $settings) {
-					if (!isset($exclude[$type])) {
+					if (!empty($exclude[$type])) {
 						add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
 					}
 				}
