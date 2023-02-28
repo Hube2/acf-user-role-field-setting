@@ -121,7 +121,7 @@
 			} else {
 				// >= 5.5.0 || < 5.6.0
 				foreach ($sections as $type => $settings) {
-					if (!empty($exclude[$type])) {
+					if ( !isset( $exclude[$type] ) || !empty($exclude[$type])) {
 						add_action('acf/render_field_settings/type='.$type, array($this, 'render_field_settings'), 1);
 					}
 				}
